@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "source ~/GDBPlugins/peda/peda.py" > ~/.gdbinit
+gdb

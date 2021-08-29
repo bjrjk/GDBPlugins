@@ -1,5 +1,4 @@
 # GDBPlugins
--------
 
 | subtree | 描述　|
 |:-------:|:-----:|
@@ -8,9 +7,7 @@
 | peda | https://github.com/longld/peda |
 
 
-本系统为gdbinit, gef, peda工具, 通过 `git subtree` 方式构建。
-
-可选使用 `git remote add` 在A项目中添加子项目B的简称。
+本系统为gdbinit, gef, peda工具, 通过 `git subtree` 方式构建。可选使用 `git remote add` 在A项目中添加子项目B的简称。
 
 ```
 语法：git remote add -f <子仓库名> <子仓库地址>
@@ -28,11 +25,10 @@
 
 
 ## gdbinit
--------
 
 添加
 ```bash
-git remote  add -f gdbinit git@github.com:gdbinit/Gdbinit.git
+git remote add -f gdbinit git@github.com:gdbinit/Gdbinit.git
 git subtree add --prefix=gdbinit gdbinit master --squash
 ```
 
@@ -42,11 +38,10 @@ git subtree pull --prefix=gdbinit git@github.com:gdbinit/Gdbinit.git master --sq
 ```
 
 ## gef
--------
 
 添加
 ```bash
-git remote  add -f gef git@github.com:hugsy/gef.git
+git remote add -f gef git@github.com:hugsy/gef.git
 git subtree add --prefix=gef gef master --squash
 ```
 
@@ -56,11 +51,10 @@ git subtree pull --prefix=gef git@github.com:hugsy/gef.git master --squash
 ```
 
 ## peda
--------
 
 添加　
 ```bash
-git remote  add -f peda git@github.com:longld/peda.git  
+git remote add -f peda git@github.com:longld/peda.git  
 git subtree add --prefix=peda peda master -squash
 ```
 
@@ -72,7 +66,12 @@ git subtree pull --prefix=peda git@github.com:longld/peda.git master --squash
 
 ## 添加到.gdbinit
 ```bash
-echo "source ~/GDBPlugins/peda/peda.py" > ~/.gdbinit 
-echo "source ~/GDBPlugins/gef/gef.py" > ~/.gdbinit 
-echo "source ~/GDBPlugins/gdbinit/gdbinit" > ~/.gdbinit  
+# peda
+echo "source ~/GDBPlugins/peda/peda.py" > ~/.gdbinit
+# gef
+echo "source ~/GDBPlugins/gef/gef.py" > ~/.gdbinit
+# gdbinit
+echo "source ~/GDBPlugins/gdbinit/gdbinit" > ~/.gdbinit
+# Add ~/GDBPlugins/scripts to your $PATH
+echo 'export PATH=$PATH:~/GDBPlugins/scripts' >> ~/.bashrc
 ```
