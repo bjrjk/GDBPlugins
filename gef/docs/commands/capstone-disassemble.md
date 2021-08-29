@@ -1,13 +1,12 @@
 ## Command capstone-disassemble ##
 
+If you have installed the [`capstone`](http://capstone-engine.org) library and
+its Python bindings, you can use it to disassemble any memory in your debugging
+session. This plugin was created to offer an alternative to `GDB`'s disassemble
+function which sometimes gets things mixed up.
 
-If you have installed [`capstone`](http://capstone-engine.org) library and its
-Python bindings, you can use it to disassemble any location in your debugging
-session. This plugin was done to offer an alternative to `GDB` disassemble
-function which sometimes gets things mixed up :)
-
-You can use its alias `cs-disassemble` and the location to disassemble (if not
-specified, it will use `$pc`).
+You can use its alias `cs-disassemble` or just `cs` with the location to
+disassemble at. If not specified, it will use `$pc`.
 
 ```
 gef➤ cs main
@@ -15,4 +14,17 @@ gef➤ cs main
 
 ![cs-disassemble](https://i.imgur.com/wypt7Fo.png)
 
+Disassemble more instructions
+```
+gef➤ cs length=20
+```
 
+Show instructions before $pc
+```
+gef➤ cs nb_prev=3
+```
+
+Show opcodes next to disassembly
+```
+gef➤ cs op
+```
