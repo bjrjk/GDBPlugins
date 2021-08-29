@@ -42,7 +42,7 @@ from utils import *
 import config
 from nasm import *
 
-if sys.version_info.major is 3:
+if sys.version_info.major == 3:
     from urllib.request import urlopen
     from urllib.parse import urlencode
     pyversion = 3
@@ -195,8 +195,7 @@ class PEDA(object):
             str = str.encode('ascii', 'ignore')
         except:
             pass
-        str = decode_string_escape(str)
-        args = shlex.split(str)
+        args = list(map(lambda x: decode_string_escape(x), shlex.split(str.decode())))
         # need more processing here
         for idx, a in enumerate(args):
             a = a.strip(",")
@@ -422,26 +421,6 @@ class PEDA(object):
         status = self.get_status()
         if not status or status == "STOPPED":
             return None
-
-        if self.is_target_remote(): # remote target
-            ctx = config.Option.get("context")
-            config.Option.set("context", None)
-            try:
-                out = self.execute_redirect("call getpid()")
-            except:
-                pass
-
-            config.Option.set("context", ctx)
-
-            if out is None:
-                return None
-            else:
-                out = self.execute_redirect("print $")
-                if out:
-                    return to_int(out.split("=")[1])
-                else:
-                    return None
-
         pid = gdb.selected_inferior().pid
         return int(pid) if pid else None
 
@@ -2260,7 +2239,7 @@ class PEDA(object):
         if not out:
             return {}
 
-        p = re.compile("\s*(0x[^-]*)->(0x[^ ]*) at (.*):\s*([^ ]*)\s*(.*)")
+        p = re.compile("\s*(0x[^-]*)->(0x[^ ]*) at (0x[^:]*):\s*([^ ]*)\s*(.*)")
         matches = p.findall(out)
 
         for (start, end, offset, hname, attr) in matches:
@@ -3061,7 +3040,7 @@ class PEDACmd(object):
         """
         pid = peda.getpid()
         if pid is None:
-            text = "not running or target is remote"
+            text = "not running"
             warning_msg(text)
             return None
             #raise Exception(text)
@@ -4271,7 +4250,7 @@ class PEDACmd(object):
 
         pc = peda.getreg("pc")
         # display register info
-        msg("\033[2J\033[0;0H [%s]" % "registers".center(78, "-"), "blue")
+        msg("[%s]" % "registers".center(78, "-"), "blue")
         self.xinfo("register")
 
         return
@@ -4392,6 +4371,10 @@ class PEDACmd(object):
         if not self._is_running():
             return
 
+        clearscr = config.Option.get("clearscr")
+        if clearscr == "on":
+            clearscreen()
+
         status = peda.get_status()
         # display registers
         if "reg" in opt or "register" in opt:
@@ -4413,6 +4396,26 @@ class PEDACmd(object):
 
         return
 
+    def breakrva(self, *arg):
+        """
+        Set breakpoint by Relative Virtual Address (RVA)
+        Usage:
+            MYNAME rva
+            MYNAME rva module_name (e.g binary, shared module name)
+        """
+        (rva, module) = normalize_argv(arg, 2)
+        if rva is None or not to_int(rva):
+            self._missing_argument()
+        if module is None:
+            module = 'binary'
+
+        binmap = peda.get_vmmap(module)
+        if len(binmap) == 0:
+            msg("No module matches '%s'" % module)
+        else:
+            base_address = binmap[0][0]
+            peda.set_breakpoint(base_address+rva)
+        return
 
     #################################
     #   Memory Operation Commands   #
@@ -4742,6 +4745,8 @@ class PEDACmd(object):
 
         step = peda.intsize()
         if not peda.is_address(address): # cannot determine address
+            msg("Invalid $SP address: 0x%x" % address, "red")
+            return
             for i in range(count):
                 if not peda.execute("x/%sx 0x%x" % ("g" if step == 8 else "w", address + i*step)):
                     break
@@ -5784,9 +5789,9 @@ class PEDACmd(object):
                 while True:
                     for os in oslist:
                         msg('%s %s'%(yellow('[+]'),green(os)))
-                    if pyversion is 2:
+                    if pyversion == 2:
                         os = input('%s'%blue('os:'))
-                    if pyversion is 3:
+                    if pyversion == 3:
                         os = input('%s'%blue('os:'))
                     if os in oslist: #check if os exist
                         break
@@ -5795,9 +5800,9 @@ class PEDACmd(object):
                 while True:
                     for job in joblist:
                         msg('%s %s'%(yellow('[+]'),green(job)))
-                    if pyversion is 2:
+                    if pyversion == 2:
                         job = raw_input('%s'%blue('job:'))
-                    if pyversion is 3:
+                    if pyversion == 3:
                         job = input('%s'%blue('job:'))
                     if job != '':
                         break
@@ -5806,9 +5811,9 @@ class PEDACmd(object):
                 while True:
                     for encode in encodelist:
                         msg('%s %s'%(yellow('[+]'),green(encode)))
-                    if pyversion is 2:
+                    if pyversion == 2:
                         encode = raw_input('%s'%blue('encode:'))
-                    if pyversion is 3:
+                    if pyversion == 3:
                         encode = input('%s'%blue('encode:'))
                     if encode != '':
                         break
@@ -6140,6 +6145,7 @@ Alias("jtrace", "peda traceinst j")
 Alias("stack", "peda telescope $sp")
 Alias("viewmem", "peda telescope")
 Alias("reg", "peda xinfo register")
+Alias("brva", "breakrva")
 
 # misc gdb settings
 peda.execute("set confirm off")
