@@ -1,49 +1,58 @@
 # GEF - GDB Enhanced Features #
 
-[![ReadTheDocs](https://readthedocs.org/projects/gef/badge/?version=latest)](https://gef.readthedocs.org/en/latest/) [![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg?maxAge=2592000?style=plastic)](https://github.com/hugsy/gef/blob/master/LICENSE) [![Python 2](https://img.shields.io/badge/Python-2-brightgreen.svg)](https://github.com/hugsy/gef/) [![Python 3](https://img.shields.io/badge/Python-3-brightgreen.svg)](https://github.com/hugsy/gef/) [![IRC](https://img.shields.io/badge/freenode-%23%23gef-yellowgreen.svg)](https://webchat.freenode.net/?channels=##gef) [![Build Status](https://travis-ci.org/hugsy/gef.svg?branch=master)](https://travis-ci.org/hugsy/gef)
+[![ReadTheDocs](https://readthedocs.org/projects/gef/badge/?version=master)](https://gef.readthedocs.org/en/master/) [![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg?maxAge=2592000?style=plastic)](https://github.com/hugsy/gef/blob/master/LICENSE) [![Python 3](https://img.shields.io/badge/Python-3-green.svg)](https://github.com/hugsy/gef/) [![Discord](https://img.shields.io/badge/Discord-GDB--GEF-yellow)](https://discord.gg/HCS8Hg7)
 
-`GEF` is a kick-ass set of commands for X86, ARM, MIPS, PowerPC and SPARC to
-make GDB cool again for exploit dev. It is aimed to be used mostly by exploiters
-and reverse-engineers, to
-provide additional features to GDB using the Python API to assist during the
-process of dynamic analysis and exploit development.
-
-`GEF` fully relies on GDB API and other Linux-specific sources of information
-(such as `/proc/<pid>`). As a consequence, some of the features might not work on
-custom or hardened systems such as GrSec.
+`GEF` (pronounced ʤɛf - "Jeff") is a kick-ass set of commands for X86, ARM, MIPS, PowerPC and SPARC to make GDB cool again for exploit dev. It is aimed to be used mostly by exploit developers and reverse-engineers, to provide additional features to GDB using the Python API to assist during the process of dynamic analysis and exploit development.
 
 It has full support for both Python2 and Python3 indifferently (as more and more
 distros start pushing `gdb` compiled with Python3 support).
 
-![gef-context](https://i.imgur.com/Fl8yuiO.png)
+![gef-context](https://i.imgur.com/E3EuQPs.png)
 
-*Some* of `GEF` features include:
+A few of `GEF` features include:
 
-  * **One** single GDB script.
-  * **No** dependencies, `GEF` is battery-included and is literally installable
-    within 5 seconds.
-  * Provides more than **50** commands to drastically change your experience in
-    GDB.
-  * Works consistently on both Python2 and Python3.
-  * Built around an architecture abstraction layer, so all commands work in any
-    GDB-supported architecture (x86-32/64, ARMv5/6/7, AARCH64, SPARC, MIPS,
-    PowerPC, etc.).
+  * **One** single GDB script
+  * Entirely **OS Agnostic**, **NO** dependencies: `GEF` is battery-included and [is installable instantly](https://gef.readthedocs.io/en/master/#setup)
+  * **Fast** limiting the number of dependencies and optimizing code to make the commands as fast as possible
+  * Provides [a great variety of commands](https://gef.readthedocs.io/en/master/commands/) to drastically change your experience in GDB.
+  * [**Easily** extensible](https://gef.readthedocs.io/en/master/api/) to create other commands by providing more comprehensible layout to GDB Python API.
+  * Full Python3 support ([Python2 support was dropped](https://github.com/hugsy/gef/releases/tag/2020.03) - see [`gef-legacy`](https://github.com/hugsy/gef-legacy)).
+  * Built around an architecture abstraction layer, so all commands work in any GDB-supported architecture such as x86-32/64, ARMv5/6/7, AARCH64, SPARC, MIPS, PowerPC, etc.
+  * Suited for real-life apps debugging, exploit development, just as much as CTF
+
+Check out the [Screenshot page](https://gef.readthedocs.io/en/master/screenshots/) for more.
+
+Or [try it online](https://demo.gef.blah.cat) (user:`gef`/password:`gef-demo`)
 
 
-## Quick start ##
+## Setup ##
 
-### Install ###
+### Quick install ###
 
-Simply make sure you have [GDB 7.x+](https://www.gnu.org/s/gdb).
+Simply make sure you have [GDB 7.7 or higher](https://www.gnu.org/s/gdb).
 
 ```bash
 # via the install script
-$ wget -q -O- https://github.com/hugsy/gef/raw/master/gef.sh | sh
+$ wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef.sh | sh
 
 # manually
-$ wget -q -O ~/.gdbinit-gef.py https://github.com/hugsy/gef/raw/master/gef.py
+$ wget -O ~/.gdbinit-gef.py -q https://github.com/hugsy/gef/raw/master/gef.py
 $ echo source ~/.gdbinit-gef.py >> ~/.gdbinit
 ```
+
+
+Alternatively from inside `gdb` directly:
+
+```bash
+$ gdb -q
+(gdb) pi \
+import urllib.request as u, tempfile as t; \
+g=t.NamedTemporaryFile(suffix='-gef.py'); \
+open(g.name, 'wb+').write( u.urlopen('https://github.com/hugsy/gef/raw/master/gef.py').read() ); \
+gdb.execute('source %s' % g.name)
+```
+
+### Run ###
 
 Then just start playing (for local files):
 
@@ -66,184 +75,128 @@ local:~ $ gdb -q
 gef➤  gef-remote -t your.ip.address:1234 -p 666
 ```
 
+
+
 ### Update ###
 
-If your host/VM is connected to the Internet, you can update `gef` easily to the latest version (even without `git` installed). with `python /path/to/gef.py --update`
-
-For example:
+If your host/VM is connected to the Internet, you can update `gef` easily to the
+latest version (even without `git` installed). with
+`python /path/to/gef.py --update`
 
 ```bash
 $ python ~/.gdbinit-gef.py --update
 Updated
 ```
 
+This will deploy the latest version of `gef`'s _master_ branch from Github.
 If no updates are available, `gef` will respond `No update` instead.
 
-## Screenshots ##
 
-This shows a few examples of new features available to you when installing
-`GEF`, with the supported architecture.
+### Install via Git ###
 
-#### Emulating code in GDB via Unicorn-Engine (x86-64) ####
+To install from Git, simply clone this repository and specify the path to
+`gef.py` inside the `~/.gdbinit` file:
 
-![gef-x86](https://i.imgur.com/emhEsol.png)
+```bash
+$ git clone https://github.com/hugsy/gef.git
+$ echo source `pwd`/gef/gef.py >> ~/.gdbinit
+```
 
-#### Displaying ELF information, memory mapping and using Capstone/Keystone integration (ARM v6) ####
+If you like living on the edge, you can then switch to the `dev` branch:
 
-![gef-arm](http://i.imgur.com/qOL8CnL.png)
-
-#### Automatic dereferencing of registers values and identifying binary protections (PowerPC) ####
-
-![gef-ppc](https://i.imgur.com/IN6x6lw.png)
-
-#### Showing current context and heap information (MIPS) ####
-
-![gef-mips](https://i.imgur.com/dBaB9os.png)
-
-#### Playing with Capstone engine (SPARC v9) ####
-
-![gef-sparc](https://i.imgur.com/VD2FpDt.png)
+```bash
+$ git checkout dev
+```
 
 
 ## Dependencies ##
 
-There are none: `GEF` works out of the box! However, to enjoy all the coolest
-features, it is **highly** recommended to install:
+There are **none**: `GEF` works out of the box!
+
+However, to enjoy all the coolest features from some commands, it is recommended
+to install:
 
 - [`capstone`](https://github.com/aquynh/capstone)
-- [`keystone`](https://github.com/keystone-engine/keystone): requires `cmake`
+- [`keystone`](https://github.com/keystone-engine/keystone)
 - [`unicorn`](https://github.com/unicorn-engine/unicorn)
-- [`ROPgadget`](https://github.com/JonathanSalwan/ROPgadget)
 - [`Ropper`](https://github.com/sashs/ropper)
 
 
-### Capstone/Keystone/Unicorn ###
-
-`GEF` greatly enhances the capabilities of GDB thanks to a full integration of
-the following libraries:
-   - [`capstone`](https://github.com/aquynh/capstone)
-   (by [Nguyen Anh Quynh](https://github.com/aquynh)) is an alternative disassembly
-   engine, and [`keystone`](https://github.com/keystone-engine/keystone) is an
-   (arguably the best) assembly engine.
-   - [`keystone`](https://github.com/keystone-engine/keystone) allows us to
-   generate opcodes, which can, for example, then be used as part of a
-   shellcode.
-
-![gef-shellcoder](https://i.imgur.com/BPdtr2D.png)
-
-   - [`unicorn`](https://github.com/unicorn-engine/unicorn) (also written
-   by [Nguyen Anh Quynh](https://github.com/aquynh)) is a lightweight Qemu-based
-   framework to emulate any architecture currently supported by `GDB` (and even
-   some more).
-
-
-#### One-liners ####
-
-For a quick installation, use the `pip` packaged version:
+For a quick installation, simply use the `pip` packaged version:
 
 ```bash
-$ pip2 install capstone unicorn keystone-engine  # for Python2.x
-$ pip3 install capstone unicorn keystone-engine  # for Python3.x
+# for Python2.x
+$ pip2 install capstone unicorn keystone-engine ropper
+
+# for Python3.x
+$ pip3 install capstone unicorn keystone-engine ropper
 ```
 
-#### Manual installation ####
-You can use `pip` to simply and quickly install it.
+Just make sure you are using the `pip` corresponding to the version of Python
+your GDB was compiled with. If you are experiencing issues installing them,
+post an issue on the GitHub of the respective projects. If your bug is not
+related to `GEF`, you will not get an answer.
 
-`capstone` and `keystone` are under very active development and improvement, so it is recommended to compile and install them from git.
+
+## Additional commands ##
+
+GEF was built to also provide a solid base for external scripts. The
+repository [`gef-extras`](https://github.com/hugsy/gef-extras) is an open
+repository where anyone can freely submit their own commands to extend GDB via
+GEF's API.
+
+To benefit from it:
 ```bash
-$ git clone https://github.com/keystone-engine/keystone.git
-$ mkdir -p keystone/build && cd keystone/build
-$ ../make-share.sh
-$ sudo make install
-$ sudo ldconfig
-$ cd ../bindings/python && sudo ./setup.py build && sudo ./setup.py install
+# via the install script
+$ wget -q -O- https://github.com/hugsy/gef/raw/master/scripts/gef-extras.sh | sh
+
+# manually
+# clone the repo
+$ https://github.com/hugsy/gef-extras.git
+# specify gef to load this directory
+$ gdb -ex 'gef config gef.extra_plugins_dir "/path/to/gef-extras/scripts"' -ex 'gef save' -ex quit
+[+] Configuration saved
 ```
 
-`capstone` provides an alternative to the `gdb` disassembler, which could be
-useful specifically when dealing with complex/uncommon instructions.
-
-
-Install is simple through `pip`, but to get the latest features from it,
-installation from the repository is recommended:
+You can also use the structures defined from this repository:
 ```bash
-$ git clone https://github.com/unicorn-engine/unicorn.git && cd unicorn && ./make.sh && sudo ./make.sh install
+$ gdb -ex 'gef config pcustom.struct_path "/path/to/gef-extras/structs"' -ex 'gef save' -ex quit
+[+] Configuration saved
 ```
 
-`unicorn` integration in `gef` allows to emulate the behaviour to specific instructions (or block of instructions) based on the runtime context, without actually running it, and therefore sparing the trouble of saving the context/running the new context/restoring the old context. Additionally, `gef` can generate a standalone `unicorn` Python script, if you want/need to reproduce steps outside the debugger.
-
-
-### ROPGadget ###
-
-[`ROPgadget`](https://github.com/JonathanSalwan/ROPgadget) (written by [Jonathan Salwan](https://github.com/JonathanSalwan)) is simply the best cross-platform ROP gadget finder. It has been totally integrated inside `gef` to benefit of all of its awesomeness.
-```bash
-$ pip[23] install ropgadget
-```
-
-### Ropper ###
-
-[`Ropper`](https://github.com/sashs/ropper) (written by [Sascha Schirra](https://github.com/sashs)) is another gadget finder. It supports opening multiple files and provides an awesome search option to find accurate gadgets.
-```bash
-$ pip[23] install ropper
-```
-
-### One-liner
-
-Some of the optional dependencies can be installed using Python package
-installer, `pip`. Simply run this
-```bash
-$ pip[23] install ropgadget ropper capstone
-```
-
-## But why not PEDA? ##
-
-Yes! Why not?! [PEDA](https://github.com/longld/peda) is a fantastic tool to
-do the same, but **only** works for x86-32 or x86-64x whereas `GEF` supports
-all the architecture supported by `GDB` (currently x86, ARM, AARCH64, MIPS,
-PowerPC, SPARC) but is designed to integrate new architectures very easily as
-well!
+There, you're now fully equipped epic pwnage with **all** GEF's goodness!!
 
 
 ## Bugs & Feedbacks ##
 
-To discuss `gef`, `gdb`, exploitation or other topics, feel free to join the
-`##gef` channel on the Freenode IRC network. You can also to me (`hugsy`) via the
-channel. For those who do not have an IRC client (like `weechat` or `irssi`),
-simply [click here](https://webchat.freenode.net/?channels=##gef).
+To discuss `gef`, `gdb`, exploitation or other topics, feel free to join our [Discord channel](https://discord.gg/HCS8Hg7).
 
-For bugs or feature requests, just
-go [here](https://github.com/hugsy/gef/issues) and provide a thorough description
-if you want help.
+For bugs or feature requests, just go [here](https://github.com/hugsy/gef/issues) and provide a thorough description if you want help.
 
+_Side Note_: `GEF` fully relies on the GDB API and other Linux-specific sources of information (such as `/proc/<pid>`). As a consequence, some of the features might not work on custom or hardened systems such as GrSec.
 
 ## Contribution ##
 
-`gef` was created and maintained by myself,
-[`@_hugsy_`](https://twitter.com/_hugsy_), but kept fresh thanks to [all
-the contributors](https://github.com/hugsy/gef/graphs/contributors).
+`gef` was created and maintained by myself, [`@_hugsy_`](https://twitter.com/_hugsy_), but kept fresh thanks to [all the contributors](https://github.com/hugsy/gef/graphs/contributors).
 
-Or if you just like the tool, feel free to drop a simple *"thanks"* on IRC,
-Twitter or other, it is **always** very appreciated.
+Or if you just like the tool, feel free to drop a simple *"thanks"* on Discord, Twitter or other, it is **always** very appreciated.
+
 
 
 ## Open-Source Rewards ##
 
-I love Open-Source, and just like
-my [other projects](https://proxenet.readthedocs.io/en/latest/#contributing)
-I've decided to offer a :beer: 4 :bug: (a.k.a *beer4bugs*) bounty for
-`GEF`, to thank everybody who helps keeping the project living and always
-better.
+I love Open-Source, and just like my [other projects](https://proxenet.readthedocs.io/en/latest/#contributing) I've decided to offer a :beer: 4 :bug: (a.k.a *beer4bugs*) bounty for `GEF`, to thank everybody who helps keeping the project living and always better.
 
 The rule is simple, provide a (substantial) contribution to `GEF`, such as:
 
    1. Submitting a Pull-Request for a new feature/command.
-   1. Submitting a Pull-Request for a new architecture support.
-   1. Or sending a relevant issue request (like a bug, crash, or else).
+   2. Submitting a Pull-Request for a new architecture support.
+   3. Or sending a relevant issue request (like a bug, crash, or else).
 
-Poke me on the IRC `##gef` channel about it, and next time we meet in person
-(like at a conference), I'll be happy to pay you a beer.
+Come on our [Discord channel](https://discord.gg/HCS8Hg7) to talk about it, and next time we meet in person (like at a conference), I'll be happy to pay you a beer.
 
 I do also accept beers if you think that the tool is cool! :wink:
 
 Cheers :beers:
 
-# Happy Hacking #
+### Happy hacking ###
